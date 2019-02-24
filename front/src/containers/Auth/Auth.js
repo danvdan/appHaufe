@@ -1,7 +1,9 @@
 import React, { Component } from "react";
+import { connect } from "react-redux";
 import Input from "../../components/UI/Input/Input";
 import Button from "../../components/UI/Button/Button";
 import classes from "./Auth.css";
+import * as actionTypes from "../../store/actions";
 
 class Auth extends Component {
   state = {
@@ -33,7 +35,9 @@ class Auth extends Component {
         valid: false,
         touched: false
       }
-    }
+    },
+    formIsValid: false,
+    error: ""
   };
 
   checkValidaty(value, rules) {
@@ -66,7 +70,32 @@ class Auth extends Component {
         touched: true
       }
     };
-    this.setState({ controls: updatedControls });
+
+    let formIsValid = true;
+    for (let inputIdentifier in updatedControls) {
+      formIsValid = updatedControls[inputIdentifier].valid && formIsValid;
+    }
+    this.setState({
+      controls: updatedControls,
+      formIsValid: formIsValid,
+      error: ""
+    });
+  };
+
+  onSubmitHandler = event => {
+    event.preventDefault();
+    const credentials = {
+      username: this.state.controls.username.value,
+      password: this.state.controls.password.value
+    };
+    if (
+      credentials.username === "haufe" &&
+      credentials.password === "lexware"
+    ) {
+      this.props.onCredentialsSubmitted(credentials);
+    } else {
+      this.setState({ ...this.state, error: "Incorrect username or password" });
+    }
   };
 
   render() {
@@ -96,11 +125,35 @@ class Auth extends Component {
 
     return (
       <div className={classes.Auth}>
+        {this.props.username && <h1> Hello {this.props.username}</h1>}
         {form}
-        <Button btnType="Success">Log In</Button>
+        <Button
+          disabled={!this.state.formIsValid}
+          clicked={this.onSubmitHandler}
+          btnType="Success"
+        >
+          Log In
+        </Button>
+        {<p className={classes.Error}>{this.state.error}</p>}
       </div>
     );
   }
 }
+const mapStateToProps = state => {
+  return {
+    username: state.credentials.username,
+    password: state.credentials.password
+  };
+};
 
-export default Auth;
+const mapDispatchToProps = dispatch => {
+  return {
+    onCredentialsSubmitted: credentials =>
+      dispatch({ type: actionTypes.SET_CREDENTIALS, credentials })
+  };
+};
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(Auth);
