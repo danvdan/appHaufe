@@ -3,6 +3,7 @@ import { connect } from "react-redux";
 import Input from "../../components/UI/Input/Input";
 import Button from "../../components/UI/Button/Button";
 import classes from "./Auth.css";
+import { withRouter } from "react-router";
 import * as actionTypes from "../../store/actions";
 
 class Auth extends Component {
@@ -93,6 +94,9 @@ class Auth extends Component {
       credentials.password === "lexware"
     ) {
       this.props.onCredentialsSubmitted(credentials);
+      this.props.history.push({
+        pathname: "/generate-dummy-data"
+      });
     } else {
       this.setState({ ...this.state, error: "Incorrect username or password" });
     }
@@ -125,7 +129,6 @@ class Auth extends Component {
 
     return (
       <div className={classes.Auth}>
-        {this.props.username && <h1> Hello {this.props.username}</h1>}
         {form}
         <Button
           disabled={!this.state.formIsValid}
@@ -142,7 +145,8 @@ class Auth extends Component {
 const mapStateToProps = state => {
   return {
     username: state.credentials.username,
-    password: state.credentials.password
+    password: state.credentials.password,
+    isAuthenticated: state.credentials.username === "haufe"
   };
 };
 
@@ -153,7 +157,9 @@ const mapDispatchToProps = dispatch => {
   };
 };
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(Auth);
+export default withRouter(
+  connect(
+    mapStateToProps,
+    mapDispatchToProps
+  )(Auth)
+);
