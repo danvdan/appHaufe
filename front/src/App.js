@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import Layout from "./hoc/Layout/Layout";
 import Auth from "./containers/Auth/Auth";
+import GenerateDummyData from "./components/GenerateDummyData/GenerateDummyData";
 import { withRouter } from "react-router";
 import { connect } from "react-redux";
 import { Switch, Route, Redirect } from "react-router-dom";
@@ -19,7 +20,7 @@ class App extends Component {
           <Route
             exact
             path="/generate-dummy-data"
-            render={() => <h1> hello from the react side!</h1>}
+            component={GenerateDummyData}
           />
           <Route
             path="/aggregation-type"

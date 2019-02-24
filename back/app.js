@@ -42,6 +42,7 @@ server.route({
 server.route({
   method: "GET",
   path: "/connected",
+  config: { cors: true },
   handler: (request, h) => {
     let response;
     if (isConnected) {
@@ -56,6 +57,7 @@ server.route({
 server.route({
   method: "GET",
   path: "/all",
+  config: { cors: true },
   handler: async (request, h) => {
     try {
       var orders = await OrderModel.find().exec();
