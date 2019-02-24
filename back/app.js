@@ -1,26 +1,37 @@
 const Hapi = require("hapi");
+const config = require("./config");
 const Mongoose = require("mongoose");
+const OrderModel = require("./models/Order");
 
 const server = new Hapi.server({
-  port: 3000,
-  host: "0.0.0.0"
+  host: config.server.host,
+  port: config.server.port
 });
 
 let isConnected = false;
 
-Mongoose.connect("mongodb://mongo:27017/orders");
+Mongoose.connect(
+  `mongodb://${config.database.host}:${config.database.port}/${
+    config.database.db
+  }`
+);
 var db = Mongoose.connection;
-
+db.on("error", () => {
+  console.log("Connection error");
+  process.exit(1);
+});
+db.once("open", () => {
+  console.log("Connection with database succeeded.");
+});
 db.on("connected", () => {
   console.log("connected");
   isConnected = true;
 });
 db.on("disconnected", () => {
-  console.log("disconnected");
+  console.log("Disconnected");
   isConnected = false;
 });
 
-//TODO remove
 server.route({
   method: "GET",
   path: "/",
@@ -28,15 +39,32 @@ server.route({
     return "Hello, world!";
   }
 });
-
 server.route({
   method: "GET",
   path: "/connected",
   handler: (request, h) => {
-    return isConnected;
+    let response;
+    if (isConnected) {
+      response = h.response(isConnected).code(200);
+    } else {
+      response = h.response().code(204);
+    }
+
+    return response;
   }
 });
-
+server.route({
+  method: "GET",
+  path: "/all",
+  handler: async (request, h) => {
+    try {
+      var orders = await OrderModel.find().exec();
+      return h.response(orders);
+    } catch (error) {
+      return h.response(error).code(500);
+    }
+  }
+});
 server.route({
   method: "GET",
   path: "/aggregation-criteria",
@@ -44,12 +72,18 @@ server.route({
     return "Map Reduce";
   }
 });
-
 server.route({
   method: "POST",
   path: "/add",
-  handler: (request, h) => {
-    return "post";
+  handler: async (request, h) => {
+    try {
+      var order = new OrderModel(request.payload);
+      var result = await order.save();
+
+      return h.response(result);
+    } catch (error) {
+      return h.response(error).code(500);
+    }
   }
 });
 

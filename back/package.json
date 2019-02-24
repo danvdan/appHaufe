@@ -5,14 +5,15 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node app.js"
+    "start": "nodemon app.js"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "boom": "^7.3.0",
     "hapi": "^18.1.0",
-    "mongoose": "^5.4.15"
+    "mongoose": "^5.4.15",
+    "nodemon": "^1.18.10"
   },
   "devDependencies": {}
 }
