@@ -24,7 +24,7 @@ db.once("open", () => {
   console.log("Connection with database succeeded.");
 });
 db.on("connected", () => {
-  console.log("connected");
+  console.log("Connected");
   isConnected = true;
 });
 db.on("disconnected", () => {
@@ -36,7 +36,7 @@ server.route({
   method: "GET",
   path: "/",
   handler: (request, h) => {
-    return "Hello, world!";
+    return "Hello from the backend side!";
   }
 });
 server.route({
