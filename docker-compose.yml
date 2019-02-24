@@ -6,6 +6,8 @@ services:
     build: ./back/
     ports:
       - "3000:3000"
+    environment:
+      WAIT_HOSTS: mongo:27017
     depends_on: [mongo]
     volumes:
       - ./back:/usr/src/backend
@@ -15,11 +17,6 @@ services:
     container_name: mongo
     image: mongo
     restart: always
-    healthcheck:
-      test: echo 'db.runCommand("ping").ok' | mongo mongo:27017/test --quiet 1
-      interval: 10s
-      timeout: 10s
-      retries: 5
     volumes:
       - ./data:/data/db
     ports:
