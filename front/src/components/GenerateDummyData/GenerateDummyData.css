@@ -1,2 +1,12 @@
 .Dummy {
+  padding: 50px;
+  text-align: center;
+}
+
+.Status {
+  color: #333;
+}
+
+.Error {
+  color: salmon;
 }

@@ -3,6 +3,7 @@ import { connect } from "react-redux";
 import Input from "../../components/UI/Input/Input";
 import Button from "../../components/UI/Button/Button";
 import classes from "./Auth.css";
+import axios from "../../axios-backend";
 import { withRouter } from "react-router";
 import * as actionTypes from "../../store/actions";
 
@@ -38,7 +39,8 @@ class Auth extends Component {
       }
     },
     formIsValid: false,
-    error: ""
+    error: "",
+    isExistingConnection: false
   };
 
   checkValidaty(value, rules) {
@@ -83,12 +85,32 @@ class Auth extends Component {
     });
   };
 
-  onSubmitHandler = event => {
+  onSubmitHandler = async event => {
     event.preventDefault();
     const credentials = {
       username: this.state.controls.username.value,
       password: this.state.controls.password.value
     };
+    try {
+      await axios.get("/connected").then(res => {
+        if (res.status === 200 && res.data === true) {
+          this.setState({ isExistingConnection: true });
+        }
+      });
+    } catch (err) {
+      this.setState({ error: "Was unable to reach the server" });
+
+      return;
+    }
+
+    if (!this.state.isExistingConnection) {
+      this.setState({
+        error: "Database connection is down, cannot authenticate"
+      });
+
+      return;
+    }
+
     if (
       credentials.username === "haufe" &&
       credentials.password === "lexware"
@@ -98,7 +120,7 @@ class Auth extends Component {
         pathname: "/generate-dummy-data"
       });
     } else {
-      this.setState({ ...this.state, error: "Incorrect username or password" });
+      this.setState({ error: "Incorrect username or password" });
     }
   };
 

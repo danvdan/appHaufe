@@ -12,7 +12,6 @@ var Order = Mongoose.model(
       required: true,
       type: String
     },
-    items: { type: [String] },
     total: {
       type: Number,
       required: true

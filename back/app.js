@@ -1,5 +1,6 @@
 const Hapi = require("hapi");
 const config = require("./config");
+const boom = require("boom");
 const Mongoose = require("mongoose");
 const OrderModel = require("./models/Order");
 
@@ -34,13 +35,6 @@ db.on("disconnected", () => {
 
 server.route({
   method: "GET",
-  path: "/",
-  handler: (request, h) => {
-    return "Hello from the backend side!";
-  }
-});
-server.route({
-  method: "GET",
   path: "/connected",
   config: { cors: true },
   handler: (request, h) => {
@@ -63,7 +57,7 @@ server.route({
       var orders = await OrderModel.find().exec();
       return h.response(orders);
     } catch (error) {
-      return h.response(error).code(500);
+      return boom.boomify(error, { statusCode: 500 });
     }
   }
 });
@@ -77,6 +71,7 @@ server.route({
 server.route({
   method: "POST",
   path: "/add",
+  config: { cors: true },
   handler: async (request, h) => {
     try {
       var order = new OrderModel(request.payload);
@@ -84,7 +79,7 @@ server.route({
 
       return h.response(result);
     } catch (error) {
-      return h.response(error).code(500);
+      return boom.boomify(error, { statusCode: 500 });
     }
   }
 });
